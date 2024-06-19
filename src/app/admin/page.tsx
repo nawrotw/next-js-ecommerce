@@ -1,4 +1,4 @@
-import { DashboardCard } from "@/app/admin/components/DashboardCard";
+import { DashboardCard } from "@/app/admin/_components/DashboardCard";
 import db from "@/db/db";
 import { formatCurrency, formatNumber } from "../../lib/formattets";
 import { wait } from "@/lib/wait";
