@@ -2,6 +2,8 @@ import { ReactNode } from "react";
 import { Nav, NavLink } from "@/components/Nav";
 import { ThemePicker } from "@/components/ThemePicker";
 
+export const dynamic = "force-dynamic";
+
 export default function AdminLayout({
   children,
 }: Readonly<{ children: ReactNode; }>) {
