@@ -1,10 +1,14 @@
 import { ReactNode } from "react";
 import { Nav, NavLink } from "@/components/Nav";
+import { ThemePicker } from "@/components/ThemePicker";
 
 export default function AdminLayout({
   children,
 }: Readonly<{ children: ReactNode; }>) {
   return <>
+    <div className='flex justify-end p-1'>
+      <ThemePicker/>
+    </div>
     <Nav>
       <NavLink href='/admin'>Dashboard</NavLink>
       <NavLink href='/admin/products'>Products</NavLink>
