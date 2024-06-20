@@ -8,23 +8,25 @@ import { ArrowRight } from "lucide-react";
 import { ProductCard, ProductCardSkeleton } from "@/components/ProductCard";
 import { Suspense } from "react";
 import { wait } from "@/lib/wait";
+import { cache } from "@/lib/cache";
 
-const getMostPopularProducts = async () => {
+const getMostPopularProducts = cache(async () => {
   await wait(300);
   return db.product.findMany({
     where: { isAvailableForPurchase: true },
     orderBy: { orders: { _count: "desc" } },
     take: 6
   });
-}
-const getNewestProducts = async () => {
+}, ['/', 'getMostPopularProducts'], { revalidate: 60 * 60 * 24 });
+
+const getNewestProducts = cache(async () => {
   await wait(500);
   return db.product.findMany({
     where: { isAvailableForPurchase: true },
     orderBy: { createdAt: "desc" },
     take: 6
   });
-}
+}, ['/', 'getNewestProducts']);
 
 export default async function Home() {
 
