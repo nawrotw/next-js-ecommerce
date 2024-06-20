@@ -1,5 +1,3 @@
-import { auth } from "@/auth";
-import AuthButton from "@/components/auth/AuthButton.server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import db from "@/db/db";
@@ -29,8 +27,6 @@ const getNewestProducts = cache(async () => {
 }, ['/', 'getNewestProducts']);
 
 export default async function Home() {
-
-  const session = await auth();
 
   return <main className="space-y-8">
     <ProductGridSection title='Most Popular' productFetcher={getMostPopularProducts}/>
