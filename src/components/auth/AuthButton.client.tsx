@@ -15,8 +15,8 @@ export default function AuthButton() {
   }
 
   return session?.data?.user ? (
-    <Button onClick={handleSignOut}>Sign Out</Button>
+    <Button variant='outline' onClick={handleSignOut}>Sign Out</Button>
   ) : (
-    <Button onClick={signIn}>Sign In</Button>
+    <Button variant='outline' onClick={signIn}>Sign In</Button>
   );
 }
