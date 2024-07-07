@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/tailwindUtils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ReactNode } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default function RootLayout({
       disableTransitionOnChange
     >
       {children}
+      <SpeedInsights/>
     </ThemeProvider>
     </body>
     </html>

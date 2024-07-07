@@ -1,6 +1,6 @@
 {
   "functions": {
-    "app/api/**/*": {
+    "app/admin/_actions/**/*": {
       "maxDuration": 60
     }
   }
