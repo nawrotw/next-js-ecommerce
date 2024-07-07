@@ -7,6 +7,10 @@ jiti("./src/env");
 
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  images: {
+    domains: ['rjcy8brirxf6nlw9.public.blob.vercel-storage.com'],
+  },
+};
 
 export default nextConfig;

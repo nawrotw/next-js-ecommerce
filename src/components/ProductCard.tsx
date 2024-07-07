@@ -9,16 +9,16 @@ export interface ProductCardProps {
   name: string;
   description: string;
   priceInCents: number;
-  imagePath: string;
+  imageUrl: string;
 }
 
 export const ProductCard = (props: ProductCardProps) => {
 
-  const { id, name, description, priceInCents, imagePath } = props
+  const { id, name, description, priceInCents, imageUrl } = props
 
   return <Card className='flex overflow-hidden flex-col'>
     <div className='relative w-full h-auto aspect-video'>
-      <Image src={imagePath} alt={name} fill/>
+      <Image src={imageUrl} alt={name} fill/>
     </div>
     <CardHeader>
       <CardTitle>{name}</CardTitle>

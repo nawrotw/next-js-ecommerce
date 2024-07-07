@@ -16,6 +16,7 @@ Every time schema.prisma changes run:
 ~~~
   prisma generate
   prisma migrate dev --create-only
+  prisma migrate resolve --rolled-back migrationName
   prisma migrate deploy
 ~~~
 

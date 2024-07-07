@@ -2,10 +2,10 @@
 
 import db from "@/db/db"
 import { z } from "zod"
-import fs from "fs/promises"
 import { notFound, redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { wait } from "@/lib/wait";
+import { put } from "@vercel/blob";
 
 const fileSchema = z.instanceof(File, { message: "Required" })
 const imageSchema = fileSchema.refine(
@@ -17,31 +17,32 @@ const addSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   priceInCents: z.coerce.number().int().min(1),
-  file: fileSchema.refine(file => file.size > 0, "Required"),
+  // file: fileSchema.refine(file => file.size > 0, "Required"),
+  file: fileSchema.optional(),
   image: imageSchema.refine(file => file.size > 0, "Required"),
-})
+});
+
+const editSchema = addSchema.extend({
+  file: fileSchema.optional(),
+  image: imageSchema.optional(),
+});
+
 
 export async function addProduct(prevState: unknown, formData: FormData) {
-  console.log('formData', formData);
-  await wait(200);
+  // await wait(200);
   const result = addSchema.safeParse(Object.fromEntries(formData.entries()))
   if (!result.success) {
     console.log('errors', result.error.formErrors)
     return result.error.formErrors.fieldErrors
   }
 
+  const productId = crypto.randomUUID();
   const data = result.data
 
-  await fs.mkdir("products", { recursive: true })
-  const filePath = `products/${crypto.randomUUID()}-${data.file.name}`
-  await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()))
-
-  await fs.mkdir("public/products", { recursive: true })
-  const imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`
-  await fs.writeFile(
-    `public${imagePath}`,
-    Buffer.from(await data.image.arrayBuffer())
-  )
+  const imagePath = `/products/${productId}/image__${data.image.name}`
+  const imageBlob = await put(imagePath, data.image, {
+    access: 'public',
+  });
 
   await db.product.create({
     data: {
@@ -49,21 +50,17 @@ export async function addProduct(prevState: unknown, formData: FormData) {
       name: data.name,
       description: data.description,
       priceInCents: data.priceInCents,
-      filePath,
-      imagePath,
+      filePath: "",
+      imageUrl: imageBlob.url,
+      imageName: data.image.name
     },
-  })
+  });
 
   revalidatePath("/")
   revalidatePath("/products")
 
   redirect("/admin/products")
 }
-
-const editSchema = addSchema.extend({
-  file: fileSchema.optional(),
-  image: imageSchema.optional(),
-})
 
 export async function updateProduct(
   id: string,
@@ -78,25 +75,22 @@ export async function updateProduct(
   const data = result.data
   const product = await db.product.findUnique({ where: { id } })
 
-  if (product == null) return notFound()
+  if (product == null) return notFound();
 
-  let filePath = product.filePath
-  if (data.file != null && data.file.size > 0) {
-    // we uploaded some file, lets replace currently existing one!
-    await fs.unlink(product.filePath)
-    filePath = `products/${crypto.randomUUID()}-${data.file.name}`
-    await fs.writeFile(filePath, Buffer.from(await data.file.arrayBuffer()))
-  }
-
-  let imagePath = product.imagePath
+  let { imageUrl, imageName } = product;
   if (data.image != null && data.image.size > 0) {
     // we uploaded some image, lets replace currently existing one!
-    await fs.unlink(`public${product.imagePath}`)
-    imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`
-    await fs.writeFile(
-      `public${imagePath}`,
-      Buffer.from(await data.image.arrayBuffer())
-    )
+    // remove image
+    //....
+    // add new 1
+    imageName = data.image.name;
+    imageUrl = imageUrl || `products/${product.id}/${imageName}`;
+    console.time("uploadImage");
+    const blob = await put(imageUrl, data.image, {
+      access: 'public',
+    });
+    console.timeEnd("uploadImage");
+    imageUrl = blob.url;
   }
 
   await db.product.update({
@@ -105,8 +99,9 @@ export async function updateProduct(
       name: data.name,
       description: data.description,
       priceInCents: data.priceInCents,
-      filePath,
-      imagePath,
+      filePath: "",
+      imageUrl,
+      imageName: imageName,
     },
   })
 
@@ -131,8 +126,9 @@ export async function deleteProduct(id: string) {
 
   if (product == null) return notFound()
 
-  await fs.unlink(product.filePath)
-  await fs.unlink(`public${product.imagePath}`)
+  // TODO wkn delete!!!
+  // await fs.unlink(product.filePath)
+  // await fs.unlink(`public${product.imagePath}`)
 
   revalidatePath("/")
   revalidatePath("/products")

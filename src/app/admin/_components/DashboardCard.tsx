@@ -14,9 +14,7 @@ export const DashboardCard = ({ title, subtitle, body }: DashboardCardProps) => 
       <CardDescription>{subtitle}</CardDescription>
     </CardHeader>
     <CardContent>
-      <p>
-        {body}
-      </p>
+      {body}
     </CardContent>
   </Card>
 }

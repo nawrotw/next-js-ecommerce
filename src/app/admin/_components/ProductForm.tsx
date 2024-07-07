@@ -2,7 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useRef } from "react";
 import { formatCurrency } from "@/lib/formattets";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -18,17 +18,38 @@ interface ProductFormProps {
 export const ProductForm = ({ product }: ProductFormProps) => {
   const [priceInCents, setPriceInCents] = useState<number | undefined>(product?.priceInCents);
 
+  const inputImageRef = useRef<HTMLInputElement>(null);
+  const [image, setImage] = useState<File | undefined>();
+  const [imageName, setImageName] = useState<string|undefined>(product?.imageName);
+
   const [error, action] = useFormState(
     product == null ? addProduct : updateProduct.bind(null, product.id),
     {}
   )
 
+  const handleSubmit = (payload: FormData) => {
+    action(payload);
+  }
 
   const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPriceInCents(Number(e.target.value) || undefined)
   }
 
-  return <form className='space-y-8' action={action}>
+  const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    // No images selected, selection dialog Cancel button pressed
+    if (!inputImageRef.current?.files || inputImageRef.current.files.length === 0) {
+      setImage(undefined);
+      setImageName(product?.imageName);
+      return;
+    }
+
+    const file = inputImageRef.current.files[0];
+    setImage(file);
+    setImageName(file.name);
+  }
+
+  return <form className='space-y-8' action={handleSubmit}>
     <div className='space-y-2'>
       <Label htmlFor="productName">Product Name</Label>
       <Input id="productName" type="text" name="name" required defaultValue={product?.name || ""}/>
@@ -61,25 +82,33 @@ export const ProductForm = ({ product }: ProductFormProps) => {
 
     <div className="space-y-2">
       <Label htmlFor="file">File</Label>
-      <Input type="file" id="file" name="file" required={product === null}/>
+      <Input type="file" id="file" name="file" />
+      {/*<Input type="file" id="file" name="file" required={product === null}/>*/}
       {product != null && <div className="text-muted-foreground">{product.filePath}</div>}
       {error.file && <div className="text-destructive">{error.file}</div>}
     </div>
 
     <div className="space-y-2">
       <Label htmlFor="image">Image</Label>
-      <Input type="file" id="image" name="image" required={product === null}/>
+      <Input ref={inputImageRef} type="file" id="image" name="image" required={product === null} onChange={handleImage}/>
 
-      {product != null && (
+      {image &&
+        <img
+          src={URL.createObjectURL(image)}
+          alt="Product image"
+          height="400"
+          width="400"
+        />
+      }
+      {product != null &&!image && (
         <Image
-          src={product.imagePath}
+          src={product.imageUrl}
           height="400"
           width="400"
           alt="Product Image"
         />
       )}
-
-
+      {imageName && <div className="text-muted-foreground">{imageName}</div>}
       {error.image && <div className="text-destructive">{error.image}</div>}
     </div>
 
