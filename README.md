@@ -8,6 +8,17 @@
   - download links should expire after some time
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+  
+
+
+## Prisma
+Every time schema.prisma changes run:
+~~~
+  prisma generate
+  prisma migrate dev --create-only
+  prisma migrate deploy
+~~~
+
 
 ## Getting Started
 
