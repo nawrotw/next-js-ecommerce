@@ -1,13 +1,13 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client/edge'
+import { withAccelerate } from "@prisma/extension-accelerate";
 
-// console.log('DATABASE_URL:', env.DATABASE_URL);
-console.log('[Db created] process.env.NODE_ENV:', process.env.NODE_ENV)
+console.log('[Db connection created] process.env.NODE_ENV:', process.env.NODE_ENV)
 
 const prismaClientSingleton = () => {
   return new PrismaClient({
     log: [/*'query',*/ 'info', 'warn', 'error'],
     errorFormat: 'pretty',
-  })
+  }).$extends(withAccelerate())
 }
 
 
