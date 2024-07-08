@@ -67,6 +67,7 @@ export async function updateProduct(
   prevState: unknown,
   formData: FormData
 ) {
+
   const result = editSchema.safeParse(Object.fromEntries(formData.entries()))
   if (!result.success) {
     return result.error.formErrors.fieldErrors
@@ -93,9 +94,6 @@ export async function updateProduct(
     imageUrl = blob.url;
   }
 
-  throw new Error("Some Error!");
-
-/*
   await db.product.update({
     where: { id },
     data: {
@@ -112,7 +110,6 @@ export async function updateProduct(
   revalidatePath("/products")
 
   redirect("/admin/products")
-*/
 }
 
 export async function toggleProductAvailability(
