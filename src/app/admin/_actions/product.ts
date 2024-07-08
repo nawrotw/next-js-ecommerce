@@ -93,6 +93,9 @@ export async function updateProduct(
     imageUrl = blob.url;
   }
 
+  throw new Error("Some Error!");
+
+/*
   await db.product.update({
     where: { id },
     data: {
@@ -109,6 +112,7 @@ export async function updateProduct(
   revalidatePath("/products")
 
   redirect("/admin/products")
+*/
 }
 
 export async function toggleProductAvailability(
